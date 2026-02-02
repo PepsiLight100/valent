@@ -3,69 +3,190 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Valentinsfrage</title>
+<title>Valentinsdate ❤️</title>
+
 <style>
-    body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background: #ffe6e6;
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        background-image: url('https://www.transparenttextures.com/patterns/diagmonds-light.png');
-    }
+body {
+    margin: 0;
+    height: 100vh;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(180deg, #ffe6eb, #fff);
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
-    h1 {
-        color: #d3003f;
-        font-size: 3em;
-        text-align: center;
-        margin-bottom: 40px;
-    }
+.container {
+    text-align: center;
+    padding: 20px;
+    max-width: 500px;
+    z-index: 2;
+}
 
-    button {
-        padding: 20px 40px;
-        border: none;
-        cursor: pointer;
-        font-size: 2em;
-        border-radius: 10px;
-        transition: transform 0.3s ease;
-        position: relative;
-    }
+h1 {
+    color: #d3003f;
+    font-size: 2.2em;
+    margin-bottom: 30px;
+}
 
-    #yesBtn {
-        background-color: #ff4d6d;
-        color: white;
-        font-size: 3em;
-        margin-right: 50px;
-    }
+.buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
 
-    #noBtn {
-        background-color: #ccc;
-        color: #555;
-    }
+button {
+    padding: 18px 35px;
+    border: none;
+    border-radius: 15px;
+    font-size: 2em;
+    cursor: pointer;
+}
+
+#yesBtn {
+    background: #ff4d6d;
+    color: white;
+    font-size: 2.6em;
+}
+
+#noBtn {
+    background: #ddd;
+    color: #666;
+    position: relative;
+}
+
+#message {
+    display: none;
+    font-size: 1.6em;
+    color: #d3003f;
+}
+
+/* Herzen */
+.heart {
+    position: fixed;
+    bottom: -20px;
+    font-size: 24px;
+    animation: floatUp linear infinite;
+    opacity: 0.8;
+    z-index: 1;
+}
+
+@keyframes floatUp {
+    from { transform: translateY(0); opacity: 1; }
+    to { transform: translateY(-110vh); opacity: 0; }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+    h1 { font-size: 1.8em; }
+    button { font-size: 1.6em; padding: 16px 28px; }
+    #yesBtn { font-size: 2.2em; }
+}
 </style>
 </head>
+
 <body>
 
-<h1>Willst du mit mir ein Valentinsdate verbringen? ❤️</h1>
-
-<div>
-    <button id="yesBtn">JA!</button>
-    <button id="noBtn">NEIN</button>
+<div class="container" id="content">
+    <h1>Willst du mit mir ein Valentinsdate verbringen? ❤️</h1>
+    <div class="buttons">
+        <button id="yesBtn">JA!</button>
+        <button id="noBtn">NEIN</button>
+    </div>
 </div>
 
-<script>
-    const noBtn = document.getElementById('noBtn');
+<div class="container" id="message">
+    ❤️❤️❤️<br><br>
+    Dann sei bitte ab <b>16 Uhr</b> bei mir zu Hause<br>
+    für dein Valentinsdate ab <b>18 Uhr in Dortmund</b> 💕<br><br>
+    📧 Diese Information wurde mir per E-Mail zugesendet.
+</div>
 
-    noBtn.addEventListener('mouseover', () => {
-        const x = Math.random() * (window.innerWidth - noBtn.clientWidth);
-        const y = Math.random() * (window.innerHeight - noBtn.clientHeight);
-        noBtn.style.position = 'absolute';
-        noBtn.style.left = x + 'px';
-        noBtn.style.top = y + 'px';
+<!-- KONFETTI CANVAS -->
+<canvas id="confetti"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+
+<script>
+/* EMAILJS */
+(function(){
+    emailjs.init("eWbToRDAMN-e3Ddre");
+})();
+
+/* NEIN BUTTON WIRD IMMER SCHNELLER */
+const noBtn = document.getElementById("noBtn");
+let speed = 300;
+
+noBtn.addEventListener("mouseover", () => {
+    speed = Math.max(80, speed - 40);
+    noBtn.style.position = "fixed";
+    noBtn.style.transition = `all ${speed}ms ease`;
+    noBtn.style.left = Math.random() * 80 + "vw";
+    noBtn.style.top = Math.random() * 80 + "vh";
+});
+
+/* JA BUTTON */
+document.getElementById("yesBtn").addEventListener("click", () => {
+    document.getElementById("content").style.display = "none";
+    document.getElementById("message").style.display = "block";
+
+    launchConfetti();
+
+    emailjs.send("service_8ct4a1p", "template_rhj8rxf", {
+        message: "JA wurde geklickt ❤️ Valentinsdate bestätigt!"
     });
+});
+
+/* HERZEN */
+function createHeart() {
+    const heart = document.createElement("div");
+    heart.className = "heart";
+    heart.innerHTML = "❤️";
+    heart.style.left = Math.random() * 100 + "vw";
+    heart.style.animationDuration = (4 + Math.random() * 4) + "s";
+    heart.style.fontSize = (16 + Math.random() * 24) + "px";
+    document.body.appendChild(heart);
+    setTimeout(() => heart.remove(), 8000);
+}
+setInterval(createHeart, 500);
+
+/* 🎉 KONFETTI */
+const canvas = document.getElementById("confetti");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+function launchConfetti() {
+    let pieces = [];
+    for (let i = 0; i < 150; i++) {
+        pieces.push({
+            x: canvas.width / 2,
+            y: canvas.height / 2,
+            r: Math.random() * 6 + 4,
+            dx: (Math.random() - 0.5) * 12,
+            dy: (Math.random() - 0.5) * 12,
+            color: `hsl(${Math.random() * 360},100%,60%)`
+        });
+    }
+
+    function update() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        pieces.forEach((p, i) => {
+            p.x += p.dx;
+            p.y += p.dy;
+            p.dy += 0.3;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fillStyle = p.color;
+            ctx.fill();
+            if (p.y > canvas.height) pieces.splice(i, 1);
+        });
+        if (pieces.length > 0) requestAnimationFrame(update);
+    }
+    update();
+}
 </script>
 
 </body>
