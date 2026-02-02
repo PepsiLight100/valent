@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Valentinsdate ❤️</title>
-
 <style>
 * {
     box-sizing: border-box;
@@ -12,24 +11,27 @@
     padding: 0;
 }
 
+html, body {
+    width: 100%;
+    height: 100%;
+}
+
 body {
-    min-height: 100vh;
     font-family: Arial, sans-serif;
     background: linear-gradient(180deg, #ffe6eb, #fff);
-    overflow-x: hidden;
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow: hidden;
     position: relative;
+    padding: 20px;
 }
 
-/* Hauptwrapper zentriert */
+/* Wrapper */
 .wrapper {
     max-width: 420px;
     width: 100%;
     text-align: center;
-    padding: 20px;
-    position: relative;
     z-index: 2;
 }
 
@@ -40,11 +42,12 @@ h1 {
     line-height: 1.3;
 }
 
+/* Buttons */
 .buttons {
     display: flex;
-    justify-content: space-between; /* Nebeneinander */
     gap: 20px;
     flex-wrap: wrap;
+    justify-content: center;
     position: relative;
 }
 
@@ -54,23 +57,23 @@ button {
     border-radius: 14px;
     font-size: 1.6rem;
     cursor: pointer;
-    flex: 1 1 45%; /* Buttons skalieren mobil */
+    flex: 1 1 45%;
 }
 
 #yesBtn {
     background: #ff4d6d;
     color: white;
     font-size: 2.2rem;
-    flex-grow: 2;
 }
 
 #noBtn {
     background: #ddd;
     color: #555;
-    position: relative; /* wird bewegt */
+    position: fixed; /* springt innerhalb des Viewports */
     z-index: 3;
 }
 
+/* Nachricht */
 #message {
     display: none;
     font-size: 1.4rem;
@@ -99,6 +102,17 @@ button {
     button { font-size: 1.4rem; padding: 14px 20px; }
     #yesBtn { font-size: 1.9rem; }
 }
+
+/* Canvas für Konfetti */
+#confetti {
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
 </style>
 </head>
 
@@ -122,17 +136,13 @@ button {
 <canvas id="confetti"></canvas>
 
 <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
-
 <script>
-/* EmailJS */
+/* EmailJS initialisieren */
 (function(){ emailjs.init("DeWbToRDAMN-e3Ddre"); })();
 
 /* NEIN BUTTON – springt bei Hover / Tippen */
 const noBtn = document.getElementById("noBtn");
 let speed = 300;
-
-noBtn.addEventListener("mouseover", moveNo);
-noBtn.addEventListener("touchstart", moveNo); // mobil
 
 function moveNo() {
     speed = Math.max(100, speed - 30);
@@ -144,6 +154,9 @@ function moveNo() {
     noBtn.style.left = Math.random() * maxX + "px";
     noBtn.style.top = Math.random() * maxY + "px";
 }
+
+noBtn.addEventListener("mouseover", moveNo);
+noBtn.addEventListener("touchstart", moveNo);
 
 /* JA BUTTON */
 document.getElementById("yesBtn").addEventListener("click", () => {
@@ -172,8 +185,13 @@ setInterval(createHeart, 600);
 /* KONFETTI */
 const canvas = document.getElementById("confetti");
 const ctx = canvas.getContext("2d");
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+window.addEventListener("resize", resizeCanvas);
+resizeCanvas();
 
 function launchConfetti() {
     let pieces = [];
