@@ -24,7 +24,6 @@ body {
     justify-content: center;
     align-items: center;
     overflow: hidden;
-    padding: 20px;
 }
 
 /* Wrapper */
@@ -36,7 +35,7 @@ body {
 }
 
 h1 {
-    font-size: 1.9rem;
+    font-size: 1.8rem;
     color: #d3003f;
     margin-bottom: 30px;
     line-height: 1.3;
@@ -44,18 +43,16 @@ h1 {
 
 /* Buttons */
 .buttons {
-    position: relative;
     display: flex;
     justify-content: center;
     gap: 16px;
-    height: 80px;
 }
 
 button {
     width: 160px;
     height: 64px;
     border: none;
-    border-radius: 14px;
+    border-radius: 16px;
     font-size: 1.6rem;
     cursor: pointer;
 }
@@ -63,13 +60,13 @@ button {
 #yesBtn {
     background: #ff4d6d;
     color: white;
+    z-index: 2;
 }
 
 #noBtn {
     background: #ddd;
     color: #555;
-    position: absolute;
-    right: 0;
+    z-index: 3;
 }
 
 /* Nachricht */
@@ -97,18 +94,13 @@ button {
 /* Konfetti */
 #confetti {
     position: fixed;
-    top: 0;
-    left: 0;
+    inset: 0;
     pointer-events: none;
-    width: 100%;
-    height: 100%;
     z-index: 1;
 }
 
 /* Mobile */
 @media (max-width: 600px) {
-    h1 { font-size: 1.6rem; }
-
     button {
         width: 140px;
         height: 56px;
@@ -140,29 +132,45 @@ button {
 <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
 
 <script>
-/* EmailJS Initialisierung */
+/* EmailJS */
 (function(){
     emailjs.init("DeWbToRDAMN-e3Ddre");
 })();
 
-/* NEIN Button springt */
+/* NEIN springt – MIT SPERRZONE */
 const noBtn = document.getElementById("noBtn");
-const buttons = document.querySelector(".buttons");
+const yesBtn = document.getElementById("yesBtn");
 
 function moveNo() {
-    const rect = buttons.getBoundingClientRect();
-    const maxX = rect.width - noBtn.offsetWidth;
-    const maxY = rect.height - noBtn.offsetHeight;
+    // Ab hier fliegt NEIN frei
+    noBtn.style.position = "fixed";
 
-    noBtn.style.left = Math.random() * maxX + "px";
-    noBtn.style.top = Math.random() * maxY + "px";
+    const yesRect = yesBtn.getBoundingClientRect();
+    const padding = 40;
+
+    let x, y, safe;
+
+    do {
+        x = Math.random() * (window.innerWidth - noBtn.offsetWidth);
+        y = Math.random() * (window.innerHeight - noBtn.offsetHeight);
+
+        safe =
+            x + noBtn.offsetWidth < yesRect.left - padding ||
+            x > yesRect.right + padding ||
+            y + noBtn.offsetHeight < yesRect.top - padding ||
+            y > yesRect.bottom + padding;
+
+    } while (!safe);
+
+    noBtn.style.left = x + "px";
+    noBtn.style.top = y + "px";
 }
 
-noBtn.addEventListener("mouseover", moveNo);
+noBtn.addEventListener("mouseenter", moveNo);
 noBtn.addEventListener("touchstart", moveNo);
 
 /* JA Button */
-document.getElementById("yesBtn").addEventListener("click", () => {
+yesBtn.addEventListener("click", () => {
     document.getElementById("content").style.display = "none";
     document.getElementById("message").style.display = "block";
     launchConfetti();
@@ -172,13 +180,13 @@ document.getElementById("yesBtn").addEventListener("click", () => {
     });
 });
 
-/* Herzen Animation */
+/* Herzen */
 function createHeart() {
     const heart = document.createElement("div");
     heart.className = "heart";
     heart.innerHTML = "❤️";
     heart.style.left = Math.random() * 100 + "vw";
-    heart.style.fontSize = (16 + Math.random() * 20) + "px";
+    heart.style.fontSize = (14 + Math.random() * 22) + "px";
     heart.style.animationDuration = (5 + Math.random() * 4) + "s";
     document.body.appendChild(heart);
     setTimeout(() => heart.remove(), 9000);
@@ -197,31 +205,28 @@ window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
 
 function launchConfetti() {
-    let pieces = [];
-    for (let i = 0; i < 120; i++) {
-        pieces.push({
-            x: canvas.width / 2,
-            y: canvas.height / 2,
-            r: Math.random() * 6 + 4,
-            dx: (Math.random() - 0.5) * 10,
-            dy: (Math.random() - 0.5) * 10,
-            color: `hsl(${Math.random() * 360},100%,60%)`
-        });
-    }
+    let pieces = Array.from({length:120}, () => ({
+        x: canvas.width / 2,
+        y: canvas.height / 2,
+        r: Math.random()*6+4,
+        dx: (Math.random()-0.5)*10,
+        dy: (Math.random()-0.5)*10,
+        color: `hsl(${Math.random()*360},100%,60%)`
+    }));
 
     function update() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        pieces.forEach((p, i) => {
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        pieces.forEach((p,i)=>{
             p.x += p.dx;
             p.y += p.dy;
             p.dy += 0.25;
             ctx.beginPath();
-            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
             ctx.fillStyle = p.color;
             ctx.fill();
-            if (p.y > canvas.height) pieces.splice(i, 1);
+            if(p.y>canvas.height) pieces.splice(i,1);
         });
-        if (pieces.length) requestAnimationFrame(update);
+        if(pieces.length) requestAnimationFrame(update);
     }
     update();
 }
