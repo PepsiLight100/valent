@@ -132,17 +132,20 @@ button {
 <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
 
 <script>
-/* EmailJS */
-(function(){
+/* ===============================
+   EMAILJS INITIALISIERUNG
+================================ */
+(function () {
     emailjs.init("DeWbToRDAMN-e3Ddre");
 })();
 
-/* NEIN springt – MIT SPERRZONE */
+/* ===============================
+   NEIN BUTTON – SPRINGT MIT SPERRZONE
+================================ */
 const noBtn = document.getElementById("noBtn");
 const yesBtn = document.getElementById("yesBtn");
 
 function moveNo() {
-    // Ab hier fliegt NEIN frei
     noBtn.style.position = "fixed";
 
     const yesRect = yesBtn.getBoundingClientRect();
@@ -169,18 +172,31 @@ function moveNo() {
 noBtn.addEventListener("mouseenter", moveNo);
 noBtn.addEventListener("touchstart", moveNo);
 
-/* JA Button */
+/* ===============================
+   JA BUTTON – AKTION + E-MAIL
+================================ */
 yesBtn.addEventListener("click", () => {
     document.getElementById("content").style.display = "none";
     document.getElementById("message").style.display = "block";
     launchConfetti();
 
-    emailjs.send("service_8ct4a1p", "template_rhj8rxf", {
-        message: "JA wurde geklickt ❤️ Valentinsdate bestätigt!"
+    emailjs.send(
+        "service_8ct4a1p",
+        "template_rhj8rxf",
+        {
+            message: "JA wurde geklickt ❤️ Valentinsdate bestätigt!"
+        },
+        "DeWbToRDAMN-e3Ddre"
+    ).then(() => {
+        console.log("✅ E-Mail erfolgreich gesendet");
+    }).catch((error) => {
+        console.error("❌ EmailJS Fehler:", error);
     });
 });
 
-/* Herzen */
+/* ===============================
+   HERZEN
+================================ */
 function createHeart() {
     const heart = document.createElement("div");
     heart.className = "heart";
@@ -193,7 +209,9 @@ function createHeart() {
 }
 setInterval(createHeart, 600);
 
-/* Konfetti */
+/* ===============================
+   KONFETTI
+================================ */
 const canvas = document.getElementById("confetti");
 const ctx = canvas.getContext("2d");
 
@@ -205,28 +223,28 @@ window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
 
 function launchConfetti() {
-    let pieces = Array.from({length:120}, () => ({
+    let pieces = Array.from({ length: 120 }, () => ({
         x: canvas.width / 2,
         y: canvas.height / 2,
-        r: Math.random()*6+4,
-        dx: (Math.random()-0.5)*10,
-        dy: (Math.random()-0.5)*10,
-        color: `hsl(${Math.random()*360},100%,60%)`
+        r: Math.random() * 6 + 4,
+        dx: (Math.random() - 0.5) * 10,
+        dy: (Math.random() - 0.5) * 10,
+        color: `hsl(${Math.random() * 360},100%,60%)`
     }));
 
     function update() {
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-        pieces.forEach((p,i)=>{
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        pieces.forEach((p, i) => {
             p.x += p.dx;
             p.y += p.dy;
             p.dy += 0.25;
             ctx.beginPath();
-            ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
             ctx.fillStyle = p.color;
             ctx.fill();
-            if(p.y>canvas.height) pieces.splice(i,1);
+            if (p.y > canvas.height) pieces.splice(i, 1);
         });
-        if(pieces.length) requestAnimationFrame(update);
+        if (pieces.length) requestAnimationFrame(update);
     }
     update();
 }
