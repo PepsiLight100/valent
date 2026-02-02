@@ -6,28 +6,40 @@
 <title>Valentinsdate ❤️</title>
 
 <style>
+* {
+    box-sizing: border-box;
+}
+
 body {
     margin: 0;
-    height: 100vh;
+    min-height: 100vh;
     font-family: Arial, sans-serif;
     background: linear-gradient(180deg, #ffe6eb, #fff);
-    overflow: hidden;
+    overflow-x: hidden;
+}
+
+/* ZENTRIERTER HAUPTWRAPPER */
+.wrapper {
+    min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
+    padding: 20px;
+    position: relative;
+    z-index: 2;
 }
 
 .container {
     text-align: center;
-    padding: 20px;
-    max-width: 500px;
-    z-index: 2;
+    max-width: 420px;
+    width: 100%;
 }
 
 h1 {
     color: #d3003f;
-    font-size: 2.2em;
+    font-size: 2rem;
     margin-bottom: 30px;
+    line-height: 1.3;
 }
 
 .buttons {
@@ -38,73 +50,74 @@ h1 {
 }
 
 button {
-    padding: 18px 35px;
+    padding: 16px 28px;
     border: none;
-    border-radius: 15px;
-    font-size: 2em;
+    border-radius: 14px;
+    font-size: 1.6rem;
     cursor: pointer;
 }
 
 #yesBtn {
     background: #ff4d6d;
     color: white;
-    font-size: 2.6em;
+    font-size: 2.2rem;
 }
 
 #noBtn {
     background: #ddd;
-    color: #666;
-    position: relative;
+    color: #555;
+    position: absolute;
 }
 
 #message {
     display: none;
-    font-size: 1.6em;
+    font-size: 1.4rem;
     color: #d3003f;
+    line-height: 1.4;
 }
 
-/* Herzen */
+/* HERZEN */
 .heart {
     position: fixed;
     bottom: -20px;
-    font-size: 24px;
     animation: floatUp linear infinite;
     opacity: 0.8;
     z-index: 1;
 }
 
 @keyframes floatUp {
-    from { transform: translateY(0); opacity: 1; }
+    from { transform: translateY(0); }
     to { transform: translateY(-110vh); opacity: 0; }
 }
 
-/* Mobile */
+/* MOBILE */
 @media (max-width: 600px) {
-    h1 { font-size: 1.8em; }
-    button { font-size: 1.6em; padding: 16px 28px; }
-    #yesBtn { font-size: 2.2em; }
+    h1 { font-size: 1.6rem; }
+    button { font-size: 1.4rem; }
+    #yesBtn { font-size: 1.9rem; }
 }
 </style>
 </head>
 
 <body>
 
-<div class="container" id="content">
-    <h1>Willst du mit mir ein Valentinsdate verbringen? ❤️</h1>
-    <div class="buttons">
-        <button id="yesBtn">JA!</button>
-        <button id="noBtn">NEIN</button>
+<div class="wrapper">
+    <div class="container" id="content">
+        <h1>Willst du mit mir ein Valentinsdate verbringen? ❤️</h1>
+        <div class="buttons">
+            <button id="yesBtn">JA!</button>
+            <button id="noBtn">NEIN</button>
+        </div>
+    </div>
+
+    <div class="container" id="message">
+        ❤️❤️❤️<br><br>
+        Dann sei bitte ab <b>16 Uhr</b> bei mir zu Hause<br>
+        für dein Valentinsdate ab <b>18 Uhr in Dortmund</b> 💕<br><br>
+        📧 Diese Information wurde mir per E-Mail zugesendet.
     </div>
 </div>
 
-<div class="container" id="message">
-    ❤️❤️❤️<br><br>
-    Dann sei bitte ab <b>16 Uhr</b> bei mir zu Hause<br>
-    für dein Valentinsdate ab <b>18 Uhr in Dortmund</b> 💕<br><br>
-    📧 Diese Information wurde mir per E-Mail zugesendet.
-</div>
-
-<!-- KONFETTI CANVAS -->
 <canvas id="confetti"></canvas>
 
 <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
@@ -115,23 +128,26 @@ button {
     emailjs.init("eWbToRDAMN-e3Ddre");
 })();
 
-/* NEIN BUTTON WIRD IMMER SCHNELLER */
+/* NEIN BUTTON – BLEIBT IM SICHTBAREN BEREICH */
 const noBtn = document.getElementById("noBtn");
 let speed = 300;
 
 noBtn.addEventListener("mouseover", () => {
-    speed = Math.max(80, speed - 40);
-    noBtn.style.position = "fixed";
+    speed = Math.max(100, speed - 40);
+
+    const padding = 20;
+    const maxX = window.innerWidth - noBtn.offsetWidth - padding;
+    const maxY = window.innerHeight - noBtn.offsetHeight - padding;
+
     noBtn.style.transition = `all ${speed}ms ease`;
-    noBtn.style.left = Math.random() * 80 + "vw";
-    noBtn.style.top = Math.random() * 80 + "vh";
+    noBtn.style.left = Math.random() * maxX + "px";
+    noBtn.style.top = Math.random() * maxY + "px";
 });
 
-/* JA BUTTON */
+/* JA */
 document.getElementById("yesBtn").addEventListener("click", () => {
     document.getElementById("content").style.display = "none";
     document.getElementById("message").style.display = "block";
-
     launchConfetti();
 
     emailjs.send("service_8ct4a1p", "template_rhj8rxf", {
@@ -145,14 +161,14 @@ function createHeart() {
     heart.className = "heart";
     heart.innerHTML = "❤️";
     heart.style.left = Math.random() * 100 + "vw";
-    heart.style.animationDuration = (4 + Math.random() * 4) + "s";
-    heart.style.fontSize = (16 + Math.random() * 24) + "px";
+    heart.style.fontSize = (16 + Math.random() * 20) + "px";
+    heart.style.animationDuration = (5 + Math.random() * 4) + "s";
     document.body.appendChild(heart);
-    setTimeout(() => heart.remove(), 8000);
+    setTimeout(() => heart.remove(), 9000);
 }
-setInterval(createHeart, 500);
+setInterval(createHeart, 600);
 
-/* 🎉 KONFETTI */
+/* KONFETTI */
 const canvas = document.getElementById("confetti");
 const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
@@ -160,13 +176,13 @@ canvas.height = window.innerHeight;
 
 function launchConfetti() {
     let pieces = [];
-    for (let i = 0; i < 150; i++) {
+    for (let i = 0; i < 120; i++) {
         pieces.push({
             x: canvas.width / 2,
             y: canvas.height / 2,
             r: Math.random() * 6 + 4,
-            dx: (Math.random() - 0.5) * 12,
-            dy: (Math.random() - 0.5) * 12,
+            dx: (Math.random() - 0.5) * 10,
+            dy: (Math.random() - 0.5) * 10,
             color: `hsl(${Math.random() * 360},100%,60%)`
         });
     }
@@ -176,14 +192,14 @@ function launchConfetti() {
         pieces.forEach((p, i) => {
             p.x += p.dx;
             p.y += p.dy;
-            p.dy += 0.3;
+            p.dy += 0.25;
             ctx.beginPath();
             ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
             ctx.fillStyle = p.color;
             ctx.fill();
             if (p.y > canvas.height) pieces.splice(i, 1);
         });
-        if (pieces.length > 0) requestAnimationFrame(update);
+        if (pieces.length) requestAnimationFrame(update);
     }
     update();
 }
